@@ -19,7 +19,7 @@ export const CurrentUserProvider = ({ children }) => {
       const { data } = await axiosRes.get("dj-rest-auth/user/");
       setCurrentUser(data);
     } catch (err) {
-      console.log(err);
+      // console.log(err);
     }
   };
 
@@ -30,20 +30,20 @@ export const CurrentUserProvider = ({ children }) => {
   useMemo(() => {
     axiosReq.interceptors.request.use(
       async (config) => {
-        if (shouldRefreshToken()){
-        try {
-          await axios.post("/dj-rest-auth/token/refresh/");
-        } catch (err) {
-          setCurrentUser((prevCurrentUser) => {
-            if (prevCurrentUser) {
-              history.push("/signin");
-            }
-            return null;
-          });
-          removeTokenTimestamp()
-          return config;
+        if (shouldRefreshToken()) {
+          try {
+            await axios.post("/dj-rest-auth/token/refresh/");
+          } catch (err) {
+            setCurrentUser((prevCurrentUser) => {
+              if (prevCurrentUser) {
+                history.push("/signin");
+              }
+              return null;
+            });
+            removeTokenTimestamp();
+            return config;
+          }
         }
-      }
         return config;
       },
       (err) => {
@@ -64,7 +64,7 @@ export const CurrentUserProvider = ({ children }) => {
               }
               return null;
             });
-            removeTokenTimestamp()
+            removeTokenTimestamp();
           }
           return axios(err.config);
         }
